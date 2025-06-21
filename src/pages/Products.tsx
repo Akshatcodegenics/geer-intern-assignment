@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,16 +22,16 @@ interface Product {
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const { addToCart, addToWishlist, isInWishlist, getTotalItems } = useCart();
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, getTotalItems } = useCart();
 
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Product[]> => {
       const response = await fetch('/api/products');
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
-      return response.json() as Promise<Product[]>;
+      return response.json();
     },
   });
 
@@ -44,36 +45,60 @@ const Products = () => {
   const categories: string[] = ["all", ...new Set(products.map((p: Product) => p.category))];
 
   const handleShare = async (product: Product) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product.name,
-          text: product.description,
-          url: `${window.location.origin}/products/${product.id}`,
-        });
+    const shareData = {
+      title: product.name,
+      text: product.description,
+      url: `${window.location.origin}/products/${product.id}`,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
         toast({
           title: "Shared!",
           description: `${product.name} has been shared successfully.`,
         });
-      } catch (error) {
-        console.log('Error sharing:', error);
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(`${product.name} - ${shareData.url}`);
+        toast({
+          title: "Link Copied!",
+          description: `Product link has been copied to clipboard.`,
+        });
       }
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`);
-      toast({
-        title: "Link Copied!",
-        description: `Product link has been copied to clipboard.`,
-      });
+    } catch (error) {
+      // If sharing fails, copy to clipboard as fallback
+      try {
+        await navigator.clipboard.writeText(`${product.name} - ${shareData.url}`);
+        toast({
+          title: "Link Copied!",
+          description: `Product link has been copied to clipboard.`,
+        });
+      } catch (clipboardError) {
+        toast({
+          title: "Share Failed",
+          description: "Unable to share or copy link.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const handleAddToWishlist = (product: Product) => {
-    addToWishlist(product);
+  const handleWishlistToggle = (product: Product) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
   };
 
   const handleAddToCart = (product: Product) => {
     addToCart(product);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=400&fit=crop';
   };
 
   if (error) {
@@ -201,6 +226,8 @@ const Products = () => {
                       src={product.imageUrl}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+                      onError={handleImageError}
+                      loading="lazy"
                     />
                   </Link>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -212,15 +239,21 @@ const Products = () => {
                       size="sm"
                       variant="outline"
                       className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:bg-white"
-                      onClick={() => handleAddToWishlist(product)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleWishlistToggle(product);
+                      }}
                     >
-                      <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                      <Heart className={`h-4 w-4 transition-colors ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:bg-white"
-                      onClick={() => handleShare(product)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleShare(product);
+                      }}
                     >
                       <Share2 className="h-4 w-4 text-gray-600" />
                     </Button>
@@ -245,7 +278,10 @@ const Products = () => {
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddToCart(product);
+                      }}
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
