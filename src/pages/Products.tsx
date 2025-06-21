@@ -1,13 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, ShoppingBag, Filter, Heart, Star, Zap } from "lucide-react";
+import { Search, ShoppingBag, Filter, Heart, Star, Zap, Share2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 interface Product {
   id: number;
@@ -21,6 +21,7 @@ interface Product {
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { addToCart, addToWishlist, isInWishlist, getTotalItems } = useCart();
 
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
@@ -41,6 +42,39 @@ const Products = () => {
   });
 
   const categories: string[] = ["all", ...new Set(products.map((p: Product) => p.category))];
+
+  const handleShare = async (product: Product) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: product.description,
+          url: `${window.location.origin}/products/${product.id}`,
+        });
+        toast({
+          title: "Shared!",
+          description: `${product.name} has been shared successfully.`,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`);
+      toast({
+        title: "Link Copied!",
+        description: `Product link has been copied to clipboard.`,
+      });
+    }
+  };
+
+  const handleAddToWishlist = (product: Product) => {
+    addToWishlist(product);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
+  };
 
   if (error) {
     toast({
@@ -65,6 +99,17 @@ const Products = () => {
               </span>
             </Link>
             <div className="flex items-center space-x-4">
+              <Link to="/payment">
+                <Button variant="ghost" className="hover:bg-indigo-50 transition-colors relative">
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Cart
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
               <Button variant="ghost" className="hover:bg-indigo-50 transition-colors">
                 <Heart className="h-4 w-4 mr-2" />
                 Wishlist
@@ -149,45 +194,65 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product: Product) => (
-              <Link key={product.id} to={`/products/${product.id}`}>
-                <Card className="h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer group bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-2xl overflow-hidden">
-                  <div className="relative overflow-hidden">
+              <Card key={product.id} className="h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-2xl overflow-hidden">
+                <div className="relative overflow-hidden">
+                  <Link to={`/products/${product.id}`}>
                     <img
                       src={product.imageUrl}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Badge className="absolute top-4 right-4 bg-white/95 text-gray-700 backdrop-blur-sm border-0 shadow-lg capitalize font-medium">
-                      {product.category}
-                    </Badge>
-                    <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Heart className="h-6 w-6 text-white hover:text-red-400 cursor-pointer transition-colors" />
-                    </div>
+                  </Link>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Badge className="absolute top-4 right-4 bg-white/95 text-gray-700 backdrop-blur-sm border-0 shadow-lg capitalize font-medium">
+                    {product.category}
+                  </Badge>
+                  <div className="absolute top-4 left-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:bg-white"
+                      onClick={() => handleAddToWishlist(product)}
+                    >
+                      <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:bg-white"
+                      onClick={() => handleShare(product)}
+                    >
+                      <Share2 className="h-4 w-4 text-gray-600" />
+                    </Button>
                   </div>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-xl group-hover:text-indigo-600 transition-colors duration-300 font-bold">
+                </div>
+                <CardHeader className="pb-3">
+                  <Link to={`/products/${product.id}`}>
+                    <CardTitle className="text-xl group-hover:text-indigo-600 transition-colors duration-300 font-bold hover:underline">
                       {product.name}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 text-gray-600 leading-relaxed">
-                      {product.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                        ${product.price}
-                      </span>
-                      <Button 
-                        size="sm" 
-                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                  </Link>
+                  <CardDescription className="line-clamp-2 text-gray-600 leading-relaxed">
+                    {product.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      ${product.price}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
