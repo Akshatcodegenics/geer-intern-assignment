@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, ShoppingBag, Filter } from "lucide-react";
+import { Search, ShoppingBag, Filter, Heart, Star, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
@@ -51,104 +51,137 @@ const Products = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
+      <nav className="bg-white/90 backdrop-blur-xl border-b border-indigo-100/50 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <ShoppingBag className="h-8 w-8 text-indigo-600" />
-              <span className="text-xl font-bold text-gray-900">GeerStore</span>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                <ShoppingBag className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                GeerStore
+              </span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost">Cart</Button>
-              <Button>Sign In</Button>
+              <Button variant="ghost" className="hover:bg-indigo-50 transition-colors">
+                <Heart className="h-4 w-4 mr-2" />
+                Wishlist
+              </Button>
+              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                Sign In
+              </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Products</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover our carefully curated collection of premium products
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header with animated elements */}
+        <div className="text-center mb-16 relative">
+          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+            <Zap className="h-32 w-32 text-indigo-600" />
+          </div>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 relative animate-fade-in">
+            Premium Collection
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed relative">
+            Discover our handpicked selection of premium products designed to elevate your lifestyle
           </p>
+          <div className="flex items-center justify-center mt-6 space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+            ))}
+            <span className="ml-2 text-gray-600 font-medium">4.9/5 Customer Rating</span>
+          </div>
         </div>
 
-        {/* Search and Filter */}
-        <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category: string) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className="capitalize"
-                >
-                  {category}
-                </Button>
-              ))}
+        {/* Enhanced Search and Filter */}
+        <div className="mb-12 bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            <div className="relative flex-1 max-w-xl">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Input
+                placeholder="Search for your perfect product..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-lg border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl bg-white/80 backdrop-blur-sm"
+              />
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Filter className="h-5 w-5 text-gray-500" />
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category: string) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className={`capitalize transition-all duration-300 ${
+                      selectedCategory === category 
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg" 
+                        : "hover:bg-indigo-50 hover:border-indigo-300"
+                    }`}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {[...Array(8)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <div className="h-48 bg-gray-200 rounded-t-lg"></div>
-                <CardHeader>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <Card key={i} className="animate-pulse bg-white/50 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+                <div className="h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-t-2xl"></div>
+                <CardHeader className="space-y-3">
+                  <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-3/4"></div>
+                  <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-1/2"></div>
                 </CardHeader>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product: Product) => (
               <Link key={product.id} to={`/products/${product.id}`}>
-                <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
-                  <div className="relative overflow-hidden rounded-t-lg">
+                <Card className="h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer group bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-2xl overflow-hidden">
+                  <div className="relative overflow-hidden">
                     <img
                       src={product.imageUrl}
                       alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <Badge className="absolute top-2 right-2 bg-white/90 text-gray-700">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Badge className="absolute top-4 right-4 bg-white/95 text-gray-700 backdrop-blur-sm border-0 shadow-lg capitalize font-medium">
                       {product.category}
                     </Badge>
+                    <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Heart className="h-6 w-6 text-white hover:text-red-400 cursor-pointer transition-colors" />
+                    </div>
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg group-hover:text-indigo-600 transition-colors">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-xl group-hover:text-indigo-600 transition-colors duration-300 font-bold">
                       {product.name}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2">
+                    <CardDescription className="line-clamp-2 text-gray-600 leading-relaxed">
                       {product.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-indigo-600">
+                      <span className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                         ${product.price}
                       </span>
-                      <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        size="sm" 
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
                         View Details
                       </Button>
                     </div>
@@ -160,12 +193,19 @@ const Products = () => {
         )}
 
         {filteredProducts.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+          <div className="text-center py-20">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-lg border border-white/20 max-w-md mx-auto">
+              <Search className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">No products found</h3>
+              <p className="text-gray-500 text-lg">Try adjusting your search or filter criteria to discover more amazing products</p>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Floating elements for visual appeal */}
+      <div className="fixed top-1/4 -left-4 w-24 h-24 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
+      <div className="fixed bottom-1/4 -right-4 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
     </div>
   );
 };
