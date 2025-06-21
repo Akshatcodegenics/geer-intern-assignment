@@ -29,7 +29,7 @@ const Products = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
-      return response.json();
+      return response.json() as Promise<Product[]>;
     },
   });
 
@@ -40,7 +40,7 @@ const Products = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ["all", ...new Set(products.map((p: Product) => p.category))];
+  const categories: string[] = ["all", ...new Set(products.map((p: Product) => p.category))];
 
   if (error) {
     toast({
@@ -92,7 +92,7 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-500" />
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
+              {categories.map((category: string) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
