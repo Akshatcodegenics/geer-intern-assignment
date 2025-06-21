@@ -1,46 +1,118 @@
-# Welcome to project
+# 🛒 geer-intern-assignment – E-Commerce Website for the New Generation
 
-## Project info
+This repository contains the submission for the **Geer Internship Assignment** – a modern, responsive, full-stack e-commerce website inspired by [Geer.in](https://geer.in).
 
+## 📋 Assignment Overview
 
+We were tasked with building a simple full-stack e-commerce application using **Next.js** for the frontend and either **Next.js API routes** or **Node.js/Express** for the backend.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📂 Folder Structure
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+geer-intern-assignment/
+├── frontend/ # Next.js app (Product listing page)
+└── backend/ # (Optional) Express API server
 
-# Step 3: Install the necessary dependencies.
-npm i
+yaml
+Copy
+Edit
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+---
+
+## 🚀 How to Run the Project
+
+### 1️⃣ Frontend Setup
+
+```bash
+cd frontend
+npm install
 npm run dev
-```
+Runs the Next.js app at http://localhost:3000
 
-**Edit a file directly in GitHub**
+2️⃣ Backend Setup (If using Express)
+bash
+Copy
+Edit
+cd backend
+npm install
+npm run start
+Runs the Express server at http://localhost:5000
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+API Base: /api/products
 
-**Use GitHub Codespaces**
+If you're using Next.js API Routes instead, the backend is integrated and no separate server setup is needed.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+🧠 Tech Stack Used
+Area	Technology
+Frontend	Next.js (React)
+Styling	Tailwind CSS / CSS Modules
+Backend	Next.js API Routes or Node.js + Express
+Data	In-memory JSON (No DB)
 
-## What technologies are used for this project?
+✅ Assignment Tasks
+📌 Task 1 – Frontend (Next.js)
+✅ Created /products route
 
-This project is built with:
+✅ Displays product list: image, name, price
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+✅ Fully responsive (mobile-friendly)
 
+✅ Fetches data from backend API
+
+🌟 Bonus Features (Optional)
+🔍 Search/filter functionality
+
+📄 Dynamic Product Page: /products/[id] with details
+
+📌 Task 2 – Backend (API)
+Option A – Next.js API Routes
+GET /api/products – Returns all products
+
+POST /api/products – Adds new product
+
+DELETE /api/products/:id – Deletes product by ID
+
+OR
+Option B – Node.js + Express
+Same endpoints created on Express server
+
+Products stored in an in-memory array
+
+⚙️ API Endpoints
+Method	Endpoint	Description
+GET	/api/products	Get all products
+POST	/api/products	Add a new product
+DELETE	/api/products/:id	Delete product by ID
+
+📝 Assumptions & Notes
+Products are stored in-memory (not persisted to DB)
+
+Product IDs are generated using uuid (or array index)
+
+All images are assumed to be hosted externally or locally in public/
+
+Search feature (if implemented) is case-insensitive and filters by name or category
+
+🤝 Submission
+✅ GitHub Repo: https://github.com/yourusername/geer-intern-assignment
+
+✅ Folder structure follows guidelines
+
+✅ This README.md explains how to run the project
+
+📩 Contact
+If you have any questions or suggestions, feel free to reach out:
+
+Your Name
+GitHub • LinkedIn • Email: your.email@example.com
+
+Thanks for reviewing my assignment. Looking forward to contributing to the Geer team! 🚀
+
+yaml
+Copy
+Edit
+
+---
+
+Would you like a basic version of the code and folder setup too?
